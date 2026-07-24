@@ -1,0 +1,63 @@
+{
+  "id": "zigpoll",
+  "name": "Zigpoll",
+  "description": "Query survey results, run response analytics, and build and distribute Zigpoll surveys from your OpenClaw agent.",
+  "contracts": {
+    "tools": [
+      "zigpoll_list_accounts",
+      "zigpoll_list_polls",
+      "zigpoll_get_poll",
+      "zigpoll_list_responses",
+      "zigpoll_response_summary",
+      "zigpoll_analyze_trends",
+      "zigpoll_get_insights",
+      "zigpoll_compare_polls",
+      "zigpoll_response_digest",
+      "zigpoll_create_poll",
+      "zigpoll_create_slide",
+      "zigpoll_publish_poll",
+      "zigpoll_send_survey",
+      "zigpoll_survey_link"
+    ]
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["apiKey"],
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Zigpoll private API key. Create one at app.zigpoll.com under Settings > Manage Integrations > API Key."
+      },
+      "defaultAccountId": {
+        "type": "string",
+        "description": "Optional Zigpoll account ID used when a tool call omits account_id. Find it with the zigpoll_list_accounts tool."
+      },
+      "digest": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Tuning for the zigpoll_response_digest tool used by scheduled check-ins.",
+        "properties": {
+          "lookbackDays": {
+            "type": "number",
+            "description": "Max days a digest looks back after downtime (default 7, max 30)."
+          },
+          "maxResponsesPerCheck": {
+            "type": "number",
+            "description": "Max responses fetched per digest check (default 500, max 1000)."
+          }
+        }
+      }
+    }
+  },
+  "toolMetadata": {
+    "zigpoll_create_poll": { "optional": true },
+    "zigpoll_create_slide": { "optional": true },
+    "zigpoll_publish_poll": { "optional": true },
+    "zigpoll_send_survey": { "optional": true },
+    "zigpoll_survey_link": { "optional": true }
+  }
+}
