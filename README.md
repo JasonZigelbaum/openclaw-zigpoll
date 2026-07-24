@@ -6,10 +6,17 @@ Official [Zigpoll](https://www.zigpoll.com) plugin for [OpenClaw](https://opencl
 
 ## Install
 
+From npm:
+
 ```bash
-openclaw plugins install clawhub:zigpoll/openclaw-plugin
-# or from npm
 openclaw plugins install npm:@zigpoll/openclaw-plugin
+```
+
+Or from a local checkout:
+
+```bash
+git clone https://github.com/JasonZigelbaum/openclaw-zigpoll
+openclaw plugins install ./openclaw-zigpoll
 ```
 
 ## Configure
