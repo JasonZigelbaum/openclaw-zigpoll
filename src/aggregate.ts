@@ -39,11 +39,45 @@ export function slideLabel(slideId: string, slides: Map<string, SlideInfo>): str
   return info ? `${info.title} [${info.type}]` : `Slide ${slideId}`;
 }
 
+/* `response` is every option a participant chose compiled into one string. That
+   is right for display and wrong for counting: tallying it buckets COMBINATIONS
+   rather than options, so a five-option checkbox produces up to 31 distinct
+   "answers" instead of five counts, and a matrix produces a near-unique string
+   per respondent. The API's `answers` array carries the components — count
+   those when present, and fall back to the string for single-answer questions
+   and for older API builds that omit the field. */
+export function answerValues(r: any): string[] {
+  if (Array.isArray(r?.answers) && r.answers.length) {
+    const values = r.answers
+      .map((a: any) => {
+        // A matrix entry is one answered row, so the row has to stay attached.
+        if (a.rowTitle !== undefined || a.rowHandle !== undefined) {
+          return `${a.rowTitle || a.rowHandle}: ${a.title ?? a.value ?? ""}`.trim();
+        }
+        if (a.rank !== undefined) return `#${a.rank} ${a.title ?? a.value ?? ""}`.trim();
+        return stripHtml(a.value ?? a.title ?? "");
+      })
+      .filter(Boolean);
+    if (values.length) return values;
+  }
+
+  const single = stripHtml(r?.response);
+  return single ? [single] : [];
+}
+
 export function answerDistribution(responses: any[]): AnswerCount[] {
   const counts = new Map<string, number>();
   for (const r of responses) {
-    const answer = truncate(stripHtml(r.response) || "No answer");
-    counts.set(answer, (counts.get(answer) ?? 0) + 1);
+    const values = answerValues(r);
+    if (!values.length) {
+      counts.set("No answer", (counts.get("No answer") ?? 0) + 1);
+      continue;
+    }
+    // One tally per selected option, so counts can exceed the response total.
+    for (const value of values) {
+      const answer = truncate(value);
+      counts.set(answer, (counts.get(answer) ?? 0) + 1);
+    }
   }
   const total = responses.length || 1;
   return [...counts.entries()]
